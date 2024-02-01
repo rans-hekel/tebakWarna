@@ -5,24 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tebak Warna</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-6xl font-bold text-center my-5 bg-gradient-to-r from-blue-500 to-teal-400 text-transparent bg-clip-text">Tebak Warna Memory Game</h1>
+    <div class="container" x-data="game()">
+        <h1 class="text-6xl font-bold text-center my-5 bg-gradient-to-r from-blue-500 to-teal-400 text-transparent bg-clip-text" x-text="title"></h1>
 
         <div class="grid grid-cols-2 gap-2 p-2 content-center md:grid-cols-4 md:gap-4 md:p-4">
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
-            <div class="aspect-[4/3] rounded-lg bg-gray-500 hover:scale-95 transiton-all duration-500 cursor-pointer"></div>
+            <template x-for="card in cards">
+                <div>
+                    <div class="aspect-[4/3] rounded-lg hover:scale-95 transiton-all duration-500 cursor-pointer" x-bind:class="'bg-'+ (card.fliped ? card.color : 'gray')+'-500'" @click="flipCard(card)" x-show="!card.cleared"></div>
+                </div>
+            </template>
         </div>
 
 
     </div>
-   
+   <script>
+    const delay = (ms = 700) => new Promise(res => setTimeout(res, ms))
+    const game = () => {
+        return {
+         title : 'Tebak Warna Memory game',
+         cards : [ { color : 'blue',fliped : false, cleared :false }, { color : 'red',fliped : false, cleared :false }, { color : 'green',fliped : false, cleared :false }, { color : 'yellow',fliped : false, cleared :false }, { color : 'blue',fliped : false, cleared :false }, { color : 'red',fliped : false, cleared :false }, { color : 'green',fliped : false, cleared :false }, { color : 'yellow',fliped : false, cleared :false }],
+         get flippedCards() {
+            return this.cards.filter(card => card.fliped)
+         },
+         get remainingCards(){
+           return this.cards.filter(card => !card.cleared)  
+         },
+     async flipCard(card) {
+            // fix bug
+            if(this.flippedCards.length === 2) return
+        
+            // buka tutup kartu
+             card.fliped = !card.fliped
+            //  cek kartu lebih dari 2
+             if(this.flippedCards.length === 2){
+                 if (this.flippedCards[0].color === this.flippedCards[1].color){
+                   await delay()
+                    this.flippedCards.forEach(card => card.cleared = true)
+                    // cek kartu sudah habis
+                    if(this.remainingCards.length === 0){
+                        alert('Selamat! Anda telah menyelesaikan permainan.')
+                        location.reload()
+                    }
+                 }
+                //  tutup semua kartu setelah dicek
+                await delay()
+                this.flippedCards.forEach(card => card.fliped = false)
+             }
+         }
+        }
+    }
+   </script>
 </body>
 </html>
