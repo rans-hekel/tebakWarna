@@ -6,6 +6,10 @@
     <title>Tebak Warna</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
 </head>
 <body>
     <div class="container" x-data="game()">
@@ -13,8 +17,8 @@
 
         <div class="grid grid-cols-2 gap-2 p-2 content-center md:grid-cols-4 md:gap-4 md:p-4">
             <template x-for="card in cards">
-                <div>
-                    <div class="aspect-[4/3] rounded-lg hover:scale-95 transiton-all duration-500 cursor-pointer" x-bind:class="'bg-'+ (card.fliped ? card.color : 'gray')+'-500'" @click="flipCard(card)" x-show="!card.cleared"></div>
+                <div class="aspect-[4/3]">
+                    <div class="aspect-[4/3] rounded-lg hover:scale-95 transiton-all duration-500 cursor-pointer" x-bind:class="['bg-'+ (card.fliped ? card.color : 'gray')+'-500', card.animate]" @click="flipCard(card)" x-show="!card.cleared"></div>
                 </div>
             </template>
         </div>
@@ -26,7 +30,7 @@
     const game = () => {
         return {
          title : 'Tebak Warna Memory game',
-         cards : [ { color : 'blue',fliped : false, cleared :false }, { color : 'red',fliped : false, cleared :false }, { color : 'green',fliped : false, cleared :false }, { color : 'yellow',fliped : false, cleared :false }, { color : 'blue',fliped : false, cleared :false }, { color : 'red',fliped : false, cleared :false }, { color : 'green',fliped : false, cleared :false }, { color : 'yellow',fliped : false, cleared :false }],
+         cards : [ { color : 'blue',fliped : false, cleared :false, animate: '' }, { color : 'red',fliped : false, cleared :false, animate: '' }, { color : 'green',fliped : false, cleared :false, animate: '' }, { color : 'yellow',fliped : false, cleared :false, animate: '' }, { color : 'blue',fliped : false, cleared :false, animate: '' }, { color : 'red',fliped : false, cleared :false, animate: '' }, { color : 'green',fliped : false, cleared :false, animate: '' }, { color : 'yellow',fliped : false, cleared :false, animate: '' }].sort(() => Math.random() - 0.5),
          get flippedCards() {
             return this.cards.filter(card => card.fliped)
          },
@@ -42,6 +46,7 @@
             //  cek kartu lebih dari 2
              if(this.flippedCards.length === 2){
                  if (this.flippedCards[0].color === this.flippedCards[1].color){
+                    this.flippedCards.forEach(card => card.animate = 'animate__animated animate__rubberBand')
                    await delay()
                     this.flippedCards.forEach(card => card.cleared = true)
                     // cek kartu sudah habis
@@ -51,8 +56,11 @@
                     }
                  }
                 //  tutup semua kartu setelah dicek
+                this.flippedCards.forEach(card => card.animate = 'animate__animated animate__shakeX')
                 await delay()
                 this.flippedCards.forEach(card => card.fliped = false)
+                //  reset fliped card
+                this.remainingCards.forEach(card => card.animate = '')
              }
          }
         }
